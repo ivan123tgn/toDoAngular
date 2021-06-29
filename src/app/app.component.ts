@@ -12,12 +12,14 @@ export class AppComponent implements OnInit {
   title = 'toDoAngular';
 
 
-  constructor(private service:TodoServiceService) {
+  constructor(public service:TodoServiceService) {
 
   }
 
   async ngOnInit() {
-    await this.service.checkUser();
+    // await this.service.checkUser();
   }
+
+
 
 }

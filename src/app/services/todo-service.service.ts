@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import {firebase} from "firebaseui-angular";
+import {AngularFireAuth} from "@angular/fire/auth";
 
 export interface toDo{
   value: string;
@@ -14,7 +15,7 @@ export interface toDo{
 })
 export class TodoServiceService {
 
-  constructor(private firestore: AngularFirestore) { }
+  constructor(public afAuth: AngularFireAuth, private firestore: AngularFirestore) { }
 
   public async getTodos() {
     const array:toDo[]=[];
@@ -43,8 +44,8 @@ export class TodoServiceService {
     this.firestore.collection("todos").doc(id).delete();
   }
 
-  public async checkUser() {
-    const user = await firebase.auth().currentUser;
+  checkUser(event:any) {
+    const user = firebase.auth().currentUser?.uid;
     console.log(user);
   }
 
