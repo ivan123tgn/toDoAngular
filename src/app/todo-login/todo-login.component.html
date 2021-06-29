@@ -1,4 +1,8 @@
-<div class="login">
-  <h2>Sign In</h2>
-  <div id="firebase-auth-container" class="auth-container"></div>
+<div *ngIf="auth.user | async as user; else showLogin">
+  <h1>Hello {{ user.displayName }}!</h1>
+  <button (click)="logout()" class="btn btn-lg btn-danger">Logout</button>
 </div>
+<ng-template #showLogin>
+  <p>Please login.</p>
+  <button (click)="loginGoogle()" class="btn btn-lg btn-primary">Login with Google</button>
+</ng-template>

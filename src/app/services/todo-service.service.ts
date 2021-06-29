@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import {firebase} from "firebaseui-angular";
 
 export interface toDo{
   value: string;
@@ -33,13 +34,18 @@ export class TodoServiceService {
       this.firestore.collection("todos").doc(data.id).set({id:data.id},{merge:true});
     })
   }
-  
+
   public async updateTodo(id:string,data:any) {
     this.firestore.collection("todos").doc(id).update(data);
   }
 
   public async removeForever(id:string) {
     this.firestore.collection("todos").doc(id).delete();
+  }
+
+  public async checkUser() {
+    const user = await firebase.auth().currentUser;
+    console.log(user);
   }
 
 }
