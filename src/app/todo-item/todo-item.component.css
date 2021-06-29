@@ -1,0 +1,33 @@
+.removed {
+    background-color:rgba(239,154,154,0.8)!important;
+}
+
+.active {
+    color:white;
+    background-color: rgba(0,0,0,0.7);
+    border-radius: 20px;
+}
+
+.completed {
+    background-color: #B0B0B0;
+    opacity: 80%;
+    border-radius: 20px;
+}
+
+.completed > span {
+    text-decoration: line-through;
+}
+
+.ch {
+    transform: scale(1.8);
+}
+
+.restoreButton {
+    font-size: 23px;
+}
+
+@media (max-width: 800px) {
+    .restoreButton {
+        font-size: 18px;
+    }
+}

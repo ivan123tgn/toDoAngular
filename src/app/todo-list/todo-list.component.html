@@ -1,0 +1,51 @@
+    <h1 class="display-1 my-5">todos</h1>
+    <input [(ngModel)]="mainInput" type="text" placeholder="Add smth to do ..." (keydown)="addSymbol($event)" class='text-center w-75 my-3'>
+
+    <ul class="w-75 p-0" cdkDropList (cdkDropListDropped)="drop($event)">
+        <app-todo-item *ngFor="let todo of todos" 
+        [item]="todo"
+        [tab]="tab"
+        (remove)="removeTodo($event)"
+        (restore)="restoreTodo($event)"
+        (removeFrvr)="removeForever($event)"
+        cdkDrag>
+        </app-todo-item>
+    </ul>
+
+    <div *ngIf="listedTodos.length || removedTodos.length" class="d-flex justify-content-between w-75 mb-4 buttons">
+        <button (click)="showTotal($event)" 
+        class="btn btn-lg" 
+        [ngClass]="{'btn-primary': this.tab === 'total', 'btn-light': this.tab !== 'total'}">
+        Total: {{listedTodos.length}}
+        </button>
+
+        <button (click)="showActive($event)" 
+        class="btn btn-lg" 
+        [ngClass]="{'btn-primary': this.tab === 'active', 'btn-light': this.tab !== 'active'}">
+        Active: {{this.calcActive()}}
+        </button>
+
+        <button (click)="showCompleted($event)" 
+        class="btn btn-lg" 
+        [ngClass]="{'btn-primary': this.tab === 'completed', 'btn-light': this.tab !== 'completed'}">
+        Completed: {{this.calcCompleted()}}
+        </button>
+
+        <button (click)="showRemoved($event)" 
+        class="btn btn-lg" 
+        [ngClass]="{'btn-primary': this.tab === 'removed', 'btn-light': this.tab !== 'removed'}">
+        Removed: {{removedTodos.length}}
+        </button>
+
+        <button (click)="removeCompleted($event)" 
+        class="btn btn-danger btn-lg"
+        *ngIf="this.tab !== 'removed'">
+        Remove completed
+        </button>
+
+        <button (click)="restoreAll($event)"
+        class="btn btn-success"
+        *ngIf="this.tab === 'removed'">
+        Restore all    
+        </button>
+    </div> 

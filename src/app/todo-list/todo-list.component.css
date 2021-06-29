@@ -1,0 +1,33 @@
+input, ul {
+    font-size: 32px;
+    list-style-type: none;
+}
+
+button {
+    font-size: 28px;
+}
+
+h1 {
+    color: yellow;
+    text-shadow: 1px 1px 2px black, 0 0 20px blue, 0 0 20px blue;
+}
+
+@media (max-width: 1300px) {
+    .buttons {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: auto;
+    }
+
+    .buttons .btn {
+        width: 50%;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 800px) {
+    input, ul, button {
+        font-size: 22px;
+    }
+}

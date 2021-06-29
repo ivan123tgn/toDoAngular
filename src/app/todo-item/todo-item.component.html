@@ -1,0 +1,15 @@
+<li [ngClass]="{'active': !item.completed, 'completed': item.completed, 'removed': item.deleted}" 
+class="my-3 d-flex justify-content-between align-items-center p-2">
+    <input type="checkbox" (change)="completeTodo(item)" [checked]="item.completed" class="ch mx-2">
+    <!-- <span>{{item.completed}}</span> -->
+    <span class="text-break">{{item.value}}</span>
+    <!-- <span>{{item.deleted}}</span> -->
+    <button (click)="removeTodo(item)" *ngIf="!item.deleted" class='btn btn-danger'>
+        <i class="bi bi bi-trash"></i>
+    </button>
+    <span *ngIf="item.deleted">
+        <button (click)="restoreTodo(item)"  class='btn btn-success restoreButton'><i class="bi bi bi-bootstrap-reboot"></i></button>
+        <button (click)="removeForever(item)" class='btn btn-danger restoreButton'><i class="bi bi bi-trash"></i></button>
+    </span> 
+        
+</li>    
