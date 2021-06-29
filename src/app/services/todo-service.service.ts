@@ -44,8 +44,8 @@ export class TodoServiceService {
     this.firestore.collection("todos").doc(id).delete();
   }
 
-  checkUser(event:any) {
-    const user = firebase.auth().currentUser?.uid;
+  async checkUser(event:any) {
+    const user = await firebase.auth().currentUser?.uid;
     console.log(user);
   }
 

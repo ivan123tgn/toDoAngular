@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    // await this.service.checkUser();
+    await this.service.checkUser({});
   }
 
 
