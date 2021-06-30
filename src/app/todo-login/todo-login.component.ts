@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
+import {TodoServiceService} from "../services/todo-service.service";
 
 @Component({
   selector:'todo-login',
@@ -9,13 +10,7 @@ import firebase from 'firebase/app';
 })
 
 export class TodoLoginComponent {
-  constructor(public auth: AngularFireAuth) {
+  constructor(public service:TodoServiceService, public auth: AngularFireAuth) {
   }
 
-  loginGoogle() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-  }
-  logout() {
-    this.auth.signOut();
-  }
 }

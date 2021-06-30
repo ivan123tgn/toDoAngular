@@ -1,8 +1,15 @@
 <div *ngIf="auth.user | async as user; else showLogin">
   <h1>Hello {{ user.displayName }}!</h1>
-  <button (click)="logout()" class="btn btn-lg btn-danger">Logout</button>
+  <button (click)="service.logout()" class="btn btn-lg btn-danger">Logout</button>
 </div>
 <ng-template #showLogin>
   <p>Please login.</p>
-  <button (click)="loginGoogle()" class="btn btn-lg btn-primary">Login with Google</button>
+  <button (click)="service.loginGoogle()" class="btn btn-lg btn-primary">Login with Google</button>
+  <button (click)="service.loginEmail()" class="btn btn-lg btn-primary">Login with e-mail/password</button>
+  <div>
+    <h1>E-mail</h1>
+    <input type="text" required>
+    <h1>Password</h1>
+    <input type="password" required>
+  </div>
 </ng-template>

@@ -47,7 +47,8 @@ export class TodoListComponent implements OnInit {
       const todoData = {
         value: this.mainInput,
         completed: false,
-        deleted: false
+        deleted: false,
+        createdBy: this.userid
       };
       this.listedTodos.push(todoData);
       this.service.addTodo(todoData);

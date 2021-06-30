@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import {firebase} from "firebaseui-angular";
-import {AngularFireAuth} from "@angular/fire/auth";
+import { AngularFireAuth } from '@angular/fire/auth';
+import firebase from 'firebase/app';
 
 export interface toDo{
   value: string;
   completed: boolean;
   deleted: boolean;
   id?: string;
+  createdBy?: string;
 }
 
 @Injectable({
@@ -15,7 +16,7 @@ export interface toDo{
 })
 export class TodoServiceService {
   userid:any = '';
-  constructor(private firestore: AngularFirestore) { }
+  constructor(private firestore: AngularFirestore, public auth: AngularFireAuth) { }
 
   public async getTodos() {
     const array:toDo[]=[];
@@ -47,4 +48,17 @@ export class TodoServiceService {
   public async getUserId() {
     this.userid = await firebase.auth().currentUser?.uid;
   }
+
+  public loginGoogle() {
+    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }
+  public logout() {
+    this.auth.signOut();
+  }
+
+  public loginEmail() {
+
+  }
+
+
 }
