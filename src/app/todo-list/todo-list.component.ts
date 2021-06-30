@@ -3,6 +3,7 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
 import { updateTypePredicateNodeWithModifier } from 'typescript';
+import {firebase} from "firebaseui-angular";
 
 @Component({
   selector: 'app-todo-list',
@@ -17,14 +18,23 @@ export class TodoListComponent implements OnInit {
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
+  userid:string = '';
 
   constructor(private service:TodoServiceService) {
-
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.userid = user.uid;
+      } else {
+        this.userid = '';
+      }
+    });
   }
 
   async ngOnInit() {
+    await this.service.getUserId();
+    this.userid = this.service.userid;
     const todos = await this.service.getTodos();
-    console.log(todos);
+    // console.log(todos);
     if (todos) {
        this.listedTodos = todos.filter(el => !el.deleted);
        this.todos = this.listedTodos;
@@ -47,7 +57,7 @@ export class TodoListComponent implements OnInit {
   }
 
   calcActive() {
-    return this.listedTodos.filter(todo => !todo.completed && !todo.deleted).length; 
+    return this.listedTodos.filter(todo => !todo.completed && !todo.deleted).length;
   }
 
   calcCompleted() {

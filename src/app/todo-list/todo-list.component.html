@@ -1,6 +1,14 @@
-    <input [(ngModel)]="mainInput" type="text" placeholder="Add smth to do ..." (keydown)="addSymbol($event)" class='text-center w-75 my-3'>
+  <div *ngIf="userid"
+        class="d-flex w-100 flex-column justify-content-center align-items-center">
+    <input [(ngModel)]="mainInput"
+           type="text"
+           placeholder="Add smth to do ..."
+           (keydown)="addSymbol($event)"
+           class='text-center w-75 my-3'>
 
-    <ul class="w-75 p-0" cdkDropList (cdkDropListDropped)="drop($event)">
+    <ul class="w-75 p-0"
+        cdkDropList
+        (cdkDropListDropped)="drop($event)">
         <app-todo-item *ngFor="let todo of todos"
         [item]="todo"
         [tab]="tab"
@@ -11,7 +19,8 @@
         </app-todo-item>
     </ul>
 
-    <div *ngIf="listedTodos.length || removedTodos.length" class="d-flex justify-content-between w-75 mb-4 buttons">
+    <div *ngIf="listedTodos.length || removedTodos.length"
+         class="d-flex justify-content-between w-75 mb-4 buttons">
         <button (click)="showTotal($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'total', 'btn-light': this.tab !== 'total'}">
@@ -48,3 +57,4 @@
         Restore all
         </button>
     </div>
+  </div>

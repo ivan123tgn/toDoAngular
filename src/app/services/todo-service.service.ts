@@ -14,8 +14,8 @@ export interface toDo{
   providedIn: 'root'
 })
 export class TodoServiceService {
-
-  constructor(public afAuth: AngularFireAuth, private firestore: AngularFirestore) { }
+  userid:any = '';
+  constructor(private firestore: AngularFirestore) { }
 
   public async getTodos() {
     const array:toDo[]=[];
@@ -44,9 +44,7 @@ export class TodoServiceService {
     this.firestore.collection("todos").doc(id).delete();
   }
 
-  async checkUser(event:any) {
-    const user = await firebase.auth().currentUser?.uid;
-    console.log(user);
+  public async getUserId() {
+    this.userid = await firebase.auth().currentUser?.uid;
   }
-
 }
