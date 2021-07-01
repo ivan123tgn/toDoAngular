@@ -5,11 +5,23 @@
 <ng-template #showLogin>
   <p>Please login.</p>
   <button (click)="service.loginGoogle()" class="btn btn-lg btn-primary">Login with Google</button>
-  <button (click)="service.loginEmail()" class="btn btn-lg btn-primary">Login with e-mail/password</button>
-  <div>
-    <h1>E-mail</h1>
-    <input type="text" required>
-    <h1>Password</h1>
-    <input type="password" required>
+  <button (click)="service.showLoginEmail()" class="btn btn-lg btn-primary">Login with e-mail/password</button>
+  <div *ngIf="service.showEmailReg">
+    <h3>E-mail</h3>
+    <input type="text"
+           required
+           placeholder="e-mail"
+           [(ngModel)]="email">
+    <h3>Password</h3>
+    <input type="password"
+           required
+           placeholder="password"
+           [(ngModel)]="password">
+    <div>
+      <button class="btn btn-lg btn-info"
+              (click)="handleEmailLogin()">Sign In</button>
+      <button class="btn btn-lg btn-info"
+              (click)="handleEmailReg()">Registration</button>
+    </div>
   </div>
 </ng-template>

@@ -12,5 +12,18 @@ import {TodoServiceService} from "../services/todo-service.service";
 export class TodoLoginComponent {
   constructor(public service:TodoServiceService, public auth: AngularFireAuth) {
   }
+  email:string = '';
+  password:string = '';
 
+  handleEmailReg() {
+    this.service.emailReg(this.email, this.password);
+    this.email = '';
+    this.password = '';
+  }
+
+  handleEmailLogin() {
+    this.service.emailLogin(this.email, this.password);
+    this.email = '';
+    this.password = '';
+  }
 }

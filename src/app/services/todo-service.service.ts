@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
+import {TodoLoginComponent} from "../todo-login/todo-login.component";
+import {AngularFireDatabase} from "@angular/fire/database";
 
 export interface toDo{
   value: string;
@@ -16,15 +18,14 @@ export interface toDo{
 })
 export class TodoServiceService {
   userid:any = '';
+  showEmailReg:boolean = false;
   constructor(private firestore: AngularFirestore, public auth: AngularFireAuth) { }
 
   public async getTodos() {
     const array:toDo[]=[];
-    const todos = await this.firestore.collection("todos").get().toPromise();
-    console.log(todos);
+    const todos = await this.firestore.collection("todos", ref => ref.where('createdBy','==',this.userid)).get().toPromise();
     if (todos && todos.docs) {
       todos.docs.forEach((el) => {
-        console.log(el.data());
         array.push(<toDo>el.data());
       })
     }
@@ -56,9 +57,27 @@ export class TodoServiceService {
     this.auth.signOut();
   }
 
-  public loginEmail() {
-
+  public showLoginEmail() {
+    this.showEmailReg = !this.showEmailReg;
   }
 
+  public emailReg(email:string, password:string) {
+    this.auth.createUserWithEmailAndPassword(email, password)
+      .then(res => {
+        console.log('You are Successfully signed up!', res);
+      })
+      .catch(error => {
+        console.log('Something is wrong:', error.message);
+      });
+  }
 
+  public emailLogin(email:string, password:string) {
+    this.auth.signInWithEmailAndPassword(email, password)
+      .then(res => {
+        console.log('You are Successfully logged in!');
+      })
+      .catch(err => {
+        console.log('Something is wrong:',err.message);
+      });
+  }
 }
