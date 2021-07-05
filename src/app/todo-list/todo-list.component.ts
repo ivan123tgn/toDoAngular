@@ -2,8 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
-import { updateTypePredicateNodeWithModifier } from 'typescript';
-import {firebase} from "firebaseui-angular";
 
 @Component({
   selector: 'app-todo-list',
@@ -11,33 +9,33 @@ import {firebase} from "firebaseui-angular";
   styleUrls: ['./todo-list.component.css']
 })
 export class TodoListComponent implements OnInit {
-  todos: toDo[] = [];
-  listedTodos: toDo[] = [];
-  removedTodos: toDo[] = [];
+  public todos: toDo[] = [];
+  public listedTodos: toDo[] = [];
+  public removedTodos: toDo[] = [];
   mainInput:any;
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
 
-  constructor(public service:TodoServiceService) {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.service.userid = user.uid;
-      } else {
-        this.service.userid = '';
-      }
-    });
-  }
+  constructor(public service:TodoServiceService) {}
 
   async ngOnInit() {
-    await this.service.getUserId();
-    const todos = await this.service.getTodos();
-    // console.log(todos);
-    if (todos) {
-       this.listedTodos = todos.filter(el => !el.deleted);
-       this.todos = this.listedTodos;
-       this.removedTodos = todos.filter(el => el.deleted);
-    }
+    const todos = await this.service.initTodos();
+
+
+    // const todos = await this.service.getTodos();
+    // // console.log(todos);
+    // if (todos) {
+    //    this.listedTodos = todos.filter(el => !el.deleted);
+    //    this.todos = this.listedTodos;
+    //    this.removedTodos = todos.filter(el => el.deleted);
+    // }
+    // if (todos) {
+    //   this.listedTodos = todos[0];
+    //   this.todos = todos[1];
+    //   this.removedTodos = todos[2];
+    // }
+
   }
 
   addSymbol(event:any) {
