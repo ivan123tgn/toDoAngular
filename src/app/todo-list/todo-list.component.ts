@@ -18,21 +18,19 @@ export class TodoListComponent implements OnInit {
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
-  userid:string = '';
 
-  constructor(private service:TodoServiceService) {
+  constructor(public service:TodoServiceService) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.userid = user.uid;
+        this.service.userid = user.uid;
       } else {
-        this.userid = '';
+        this.service.userid = '';
       }
     });
   }
 
   async ngOnInit() {
     await this.service.getUserId();
-    this.userid = this.service.userid;
     const todos = await this.service.getTodos();
     // console.log(todos);
     if (todos) {
@@ -48,7 +46,7 @@ export class TodoListComponent implements OnInit {
         value: this.mainInput,
         completed: false,
         deleted: false,
-        createdBy: this.userid
+        createdBy: this.service.userid
       };
       this.listedTodos.push(todoData);
       this.service.addTodo(todoData);

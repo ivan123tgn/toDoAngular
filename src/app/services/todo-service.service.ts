@@ -17,13 +17,13 @@ export interface toDo{
   providedIn: 'root'
 })
 export class TodoServiceService {
-  userid:any = '';
+  public userid:any = '';
   showEmailReg:boolean = false;
-  constructor(private firestore: AngularFirestore, public auth: AngularFireAuth) { }
+  constructor(public firestore: AngularFirestore, public auth: AngularFireAuth) { }
 
   public async getTodos() {
     const array:toDo[]=[];
-    const todos = await this.firestore.collection("todos", ref => ref.where('createdBy','==',this.userid)).get().toPromise();
+    const todos = await this.firestore.collection("todos").get().toPromise();
     if (todos && todos.docs) {
       todos.docs.forEach((el) => {
         array.push(<toDo>el.data());
