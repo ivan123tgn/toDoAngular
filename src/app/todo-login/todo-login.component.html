@@ -3,9 +3,12 @@
   <button (click)="service.logout()" class="btn btn-lg btn-danger">Logout</button>
 </div>
 <ng-template #showLogin>
-  <p>Please login.</p>
-  <button (click)="service.loginGoogle()" class="btn btn-lg btn-primary">Login with Google</button>
-  <button (click)="service.showLoginEmail()" class="btn btn-lg btn-primary">Login with e-mail/password</button>
+  <p class="h2 loginText mb-4">You are not signed in!</p>
+  <p class="h2 loginText mb-5">Please, login to continue.</p>
+  <div class="text-center d-flex flex-column justify-content-center w-100 align-items-center">
+    <button (click)="service.loginGoogle()" class="btn btn-lg btn-dark mb-4">Login with Google</button>
+    <button (click)="service.showLoginEmail()" class="btn btn-lg btn-dark mb-4">Login with e-mail/password</button>
+  </div>
   <div *ngIf="service.showEmailReg">
     <h3>E-mail</h3>
     <input type="text"

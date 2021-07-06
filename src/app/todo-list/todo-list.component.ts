@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
+import { updateTypePredicateNodeWithModifier } from 'typescript';
+import {firebase} from "firebaseui-angular";
 
 @Component({
   selector: 'app-todo-list',
@@ -9,20 +11,38 @@ import { toDo, TodoServiceService } from '../services/todo-service.service';
   styleUrls: ['./todo-list.component.css']
 })
 export class TodoListComponent implements OnInit {
-  public todos: toDo[] = [];
-  public listedTodos: toDo[] = [];
-  public removedTodos: toDo[] = [];
+  todos: toDo[] = [];
+  listedTodos: toDo[] = [];
+  removedTodos: toDo[] = [];
   mainInput:any;
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
+  userid:string = '';
 
-  constructor(public service:TodoServiceService) {}
+  constructor(private service:TodoServiceService) {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.userid = user.uid;
+      } else {
+        this.userid = '';
+      }
+      this.service.getTodos(this.userid)
+        .then(todosFromService => {
+          this.todos = todosFromService;
+          if (this.todos) {
+            this.listedTodos = this.todos.filter(el => !el.deleted);
+            this.removedTodos = this.todos.filter(el => el.deleted);
+            this.todos = this.listedTodos;
+          }
+        });
+    });
+  }
 
   async ngOnInit() {
-    const todos = await this.service.initTodos();
-
-
+    // const user = this.service.getUserId() ;
+    // console.log(user);
+    // // this.userid = this.service.userid;
     // const todos = await this.service.getTodos();
     // // console.log(todos);
     // if (todos) {
@@ -30,12 +50,6 @@ export class TodoListComponent implements OnInit {
     //    this.todos = this.listedTodos;
     //    this.removedTodos = todos.filter(el => el.deleted);
     // }
-    // if (todos) {
-    //   this.listedTodos = todos[0];
-    //   this.todos = todos[1];
-    //   this.removedTodos = todos[2];
-    // }
-
   }
 
   addSymbol(event:any) {
@@ -44,7 +58,7 @@ export class TodoListComponent implements OnInit {
         value: this.mainInput,
         completed: false,
         deleted: false,
-        createdBy: this.service.userid
+        createdBy: this.userid
       };
       this.listedTodos.push(todoData);
       this.service.addTodo(todoData);

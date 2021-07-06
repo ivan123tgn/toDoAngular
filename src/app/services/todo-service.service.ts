@@ -4,8 +4,6 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
 import {TodoLoginComponent} from "../todo-login/todo-login.component";
 import {AngularFireDatabase} from "@angular/fire/database";
-import {TodoListComponent} from "../todo-list/todo-list.component";
-import {resolve} from "@angular/compiler-cli/src/ngtsc/file_system";
 
 export interface toDo{
   value: string;
@@ -19,69 +17,19 @@ export interface toDo{
   providedIn: 'root'
 })
 export class TodoServiceService {
-  public userid:any = '';
+  userid:any = '';
   showEmailReg:boolean = false;
-  constructor(public firestore: AngularFirestore, public auth: AngularFireAuth) {
-    // auth.onAuthStateChanged((user) => {
-    //   if (user) {
-    //     this.userid = user.uid;
-    //     console.log('check_auth,yes');
-    //     this.getTodos();
-    //   } else {
-    //     this.userid = '';
-    //     console.log('check_auth,no')
-    //     this.getTodos();
-    //   }
-    // });
-  }
+  constructor(private firestore: AngularFirestore, public auth: AngularFireAuth) { }
 
-  // public async getTodos() {
-  //   const array:toDo[]=[];
-  //   console.log('get todos')
-  //   const todos = await this.firestore.collection("todos").get().toPromise();
-  //   if (todos && todos.docs) {
-  //     todos.docs.forEach((el) => {
-  //       array.push(<toDo>el.data());
-  //     })
-  //   }
-  //   return array;
-  // }
-
-  public async initTodos() {
-    await this.auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.userid = user.uid;
-        console.log('check_auth,yes');
-        // this.getTodos();
-      } else {
-        this.userid = '';
-        console.log('check_auth,no')
-        //this.getTodos();
-      }
-      console.log(this.userid);
-      const data = this.getTodos();
-      console.log(data);
-      // return data;
-      // return(a);
-    });
-  }
-
-  public async getTodos() {
-    let array:toDo[]=[];
-    let listedArray:toDo[]=[];
-    let removedArray:toDo[]=[];
-
-    console.log('get todos')
-    console.log(this.userid);
-    const todos = await this.firestore.collection("todos").get().toPromise();
+  public async getTodos(user:string) {
+    const array:toDo[]=[];
+    const todos = await this.firestore.collection("todos", ref => ref.where('createdBy','==',user)).get().toPromise();
     if (todos && todos.docs) {
       todos.docs.forEach((el) => {
         array.push(<toDo>el.data());
       })
-      listedArray = array.filter(el => !el.deleted);
-      removedArray = array.filter(el => el.deleted);
     }
-    return [array, listedArray, removedArray];
+    return array;
   }
 
   public async addTodo(todoData:toDo) {
