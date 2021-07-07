@@ -4,6 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
 import {TodoLoginComponent} from "../todo-login/todo-login.component";
 import {AngularFireDatabase} from "@angular/fire/database";
+import { ToastrService } from 'ngx-toastr';
 
 export interface toDo{
   value: string;
@@ -19,7 +20,10 @@ export interface toDo{
 export class TodoServiceService {
   userid:any = '';
   showEmailReg:boolean = false;
-  constructor(private firestore: AngularFirestore, public auth: AngularFireAuth) { }
+  constructor(
+    private firestore: AngularFirestore,
+    public auth: AngularFireAuth,
+    private toastr: ToastrService) { }
 
   public async getTodos(user:string) {
     const array:toDo[]=[];
@@ -47,10 +51,12 @@ export class TodoServiceService {
   }
 
   public loginGoogle() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then(res => this.toastr.success('You are successfully signed in!', 'Sign In'), err => this.toastr.error(err.message,'SignIn'));
   }
+
   public logout() {
-    this.auth.signOut();
+    this.auth.signOut().then(res => this.toastr.warning('You are logged out.'), err => this.toastr.error('Log Out Error!'));
   }
 
   public showLoginEmail() {
@@ -60,9 +66,11 @@ export class TodoServiceService {
   public emailReg(email:string, password:string) {
     this.auth.createUserWithEmailAndPassword(email, password)
       .then(res => {
+        this.toastr.success('You are successfully signed up!', 'Sign Up');
         console.log('You are Successfully signed up!', res);
       })
       .catch(error => {
+        this.toastr.error(error.message,'SignUp');
         console.log('Something is wrong:', error.message);
       });
   }
@@ -70,9 +78,11 @@ export class TodoServiceService {
   public emailLogin(email:string, password:string) {
     this.auth.signInWithEmailAndPassword(email, password)
       .then(res => {
-        console.log('You are Successfully logged in!');
+        this.toastr.success('You are successfully signed in!', 'Sign In');
+        console.log('You are Successfully logged in!', res);
       })
       .catch(err => {
+        this.toastr.error(err.message,'SignIn');
         console.log('Something is wrong:',err.message);
       });
   }

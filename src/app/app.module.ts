@@ -15,6 +15,9 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { TodoServiceService } from './services/todo-service.service';
 import {AngularFireAuthModule} from "@angular/fire/auth";
 import {TodoLoginComponent} from "./todo-login/todo-login.component";
+import { ToastrModule } from 'ngx-toastr';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -32,7 +35,10 @@ import {TodoLoginComponent} from "./todo-login/todo-login.component";
     DragDropModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    ToastrModule.forRoot(),
+    MatInputModule,
+    MatFormFieldModule
   ],
   providers: [TodoServiceService],
   bootstrap: [AppComponent]

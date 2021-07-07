@@ -1,29 +1,30 @@
-<div *ngIf="auth.user | async as user; else showLogin">
-  <h1>Hello {{ user.displayName }}!</h1>
-  <button (click)="service.logout()" class="btn btn-lg btn-danger">Logout</button>
+<div *ngIf="auth.user | async as user; else showLogin" class="text-center">
+  <h1 class="greeting mb-4">Hello, {{ user.displayName || 'nameless user' }}!</h1>
+  <button (click)="service.logout()" class="btn btn-lg btn-danger mb-4">Logout</button>
 </div>
 <ng-template #showLogin>
   <p class="h2 loginText mb-4">You are not signed in!</p>
   <p class="h2 loginText mb-5">Please, login to continue.</p>
   <div class="text-center d-flex flex-column justify-content-center w-100 align-items-center">
-    <button (click)="service.loginGoogle()" class="btn btn-lg btn-dark mb-4">Login with Google</button>
-    <button (click)="service.showLoginEmail()" class="btn btn-lg btn-dark mb-4">Login with e-mail/password</button>
+    <button (click)="service.loginGoogle()" class="btn btn-lg btn-dark mb-4">Login with Google | <i class="bi bi-google"></i></button>
+    <button (click)="service.showLoginEmail()" class="btn btn-lg btn-dark mb-4">Login with e-mail/password | <i class="bi bi-envelope"></i></button>
   </div>
-  <div *ngIf="service.showEmailReg">
+  <div *ngIf="service.showEmailReg" class="text-center">
     <h3>E-mail</h3>
     <input type="text"
            required
            placeholder="e-mail"
            [(ngModel)]="email">
+
     <h3>Password</h3>
     <input type="password"
            required
            placeholder="password"
            [(ngModel)]="password">
-    <div>
-      <button class="btn btn-lg btn-info"
+    <div class="mt-3">
+      <button class="btn btn-lg btn-info mx-2"
               (click)="handleEmailLogin()">Sign In</button>
-      <button class="btn btn-lg btn-info"
+      <button class="btn btn-lg btn-info mx-2"
               (click)="handleEmailReg()">Registration</button>
     </div>
   </div>

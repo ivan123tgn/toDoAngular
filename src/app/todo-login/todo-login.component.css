@@ -8,4 +8,7 @@ p,h1, h3 {
   text-shadow: 1px 1px 2px black, 0 0 20px blue, 0 0 20px blue;
 }
 
-
+.greeting {
+  color: yellow;
+  text-shadow: 1px 1px 2px black, 0 0 20px blue, 0 0 20px blue;
+}
