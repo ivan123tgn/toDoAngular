@@ -18,6 +18,9 @@ import {TodoLoginComponent} from "./todo-login/todo-login.component";
 import { ToastrModule } from 'ngx-toastr';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatIconModule} from '@angular/material/icon';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -38,9 +41,14 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     AngularFireAuthModule,
     ToastrModule.forRoot(),
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatSidenavModule,
+    MatIconModule,
+    ReactiveFormsModule
   ],
   providers: [TodoServiceService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+

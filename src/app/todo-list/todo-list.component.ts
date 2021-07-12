@@ -2,8 +2,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
-import { updateTypePredicateNodeWithModifier } from 'typescript';
 import {firebase} from "firebaseui-angular";
+import {AngularFireAuthModule} from "@angular/fire/auth";
+
+
 
 @Component({
   selector: 'app-todo-list',
@@ -20,7 +22,7 @@ export class TodoListComponent implements OnInit {
   tab:string ='total';
   userid:string = '';
 
-  constructor(private service:TodoServiceService) {
+  constructor(private service:TodoServiceService, public auth:AngularFireAuthModule) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.userid = user.uid;

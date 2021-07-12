@@ -1,6 +1,7 @@
-import {Component} from "@angular/core";
+import {Component, ViewChild} from "@angular/core";
 import { AngularFireAuth } from '@angular/fire/auth';
 import {TodoServiceService} from "../services/todo-service.service";
+import {FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector:'todo-login',
@@ -11,19 +12,28 @@ import {TodoServiceService} from "../services/todo-service.service";
 export class TodoLoginComponent {
   constructor(public service:TodoServiceService, public auth: AngularFireAuth) {
   }
-  email:string = '';
+
   password:string = '';
+  hidePswd:boolean = true;
+  emailForm = new FormControl('', [Validators.required, Validators.email]);
 
   handleEmailReg() {
-    this.service.emailReg(this.email, this.password);
-    this.email = '';
+    this.service.emailReg(this.emailForm.value, this.password);
+    this.emailForm.setValue('');
     this.password = '';
   }
 
   handleEmailLogin() {
-    this.service.emailLogin(this.email, this.password);
-    this.email = '';
+    this.service.emailLogin(this.emailForm.value, this.password);
+    this.emailForm.setValue('');
     this.password = '';
+  }
+
+  getErrorMessage() {
+    if (this.emailForm.hasError('required')) {
+      return 'You must enter a value';
+    }
+    return this.emailForm.hasError('email') ? 'Not a valid email' : '';
   }
 
 }

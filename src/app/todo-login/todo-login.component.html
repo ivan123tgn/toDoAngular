@@ -5,27 +5,60 @@
 <ng-template #showLogin>
   <p class="h2 loginText mb-4">You are not signed in!</p>
   <p class="h2 loginText mb-5">Please, login to continue.</p>
-  <div class="text-center d-flex flex-column justify-content-center w-100 align-items-center">
-    <button (click)="service.loginGoogle()" class="btn btn-lg btn-dark mb-4">Login with Google | <i class="bi bi-google"></i></button>
-    <button (click)="service.showLoginEmail()" class="btn btn-lg btn-dark mb-4">Login with e-mail/password | <i class="bi bi-envelope"></i></button>
-  </div>
-  <div *ngIf="service.showEmailReg" class="text-center">
-    <h3>E-mail</h3>
-    <input type="text"
-           required
-           placeholder="e-mail"
-           [(ngModel)]="email">
 
-    <h3>Password</h3>
-    <input type="password"
-           required
-           placeholder="password"
-           [(ngModel)]="password">
-    <div class="mt-3">
-      <button class="btn btn-lg btn-info mx-2"
-              (click)="handleEmailLogin()">Sign In</button>
-      <button class="btn btn-lg btn-info mx-2"
-              (click)="handleEmailReg()">Registration</button>
-    </div>
-  </div>
+  <mat-drawer-container class="loginMenu" [hasBackdrop]="true">
+
+    <mat-drawer #drawer [mode]="'over'" class="loginDrawer w-25">
+
+      <div class="text-center d-flex flex-column justify-content-center w-100 align-items-center">
+        <p class="h4 my-5">Choose method to sign-in</p>
+        <button (click)="service.loginGoogle()" class="btn btn-lg btn-dark mb-5">Login with Google | <i class="bi bi-google"></i></button>
+        <button (click)="service.showLoginEmail()" class="btn btn-lg btn-dark mb-5">Login with e-mail/password | <i class="bi bi-envelope"></i></button>
+      </div>
+
+      <div *ngIf="service.showEmailReg" class="text-center">
+        <h3 class="my-4">E-mail</h3>
+<!--        <input type="text"-->
+<!--               required-->
+<!--               placeholder="e-mail"-->
+<!--               [(ngModel)]="email">-->
+
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your email</mat-label>
+          <input matInput placeholder="pat@example.com" [formControl]="emailForm" required>
+          <mat-error *ngIf="emailForm.invalid">{{getErrorMessage()}}</mat-error>
+<!--          <div>{{emailForm.value}}</div>-->
+        </mat-form-field>
+
+        <h3 class="my-4">Password</h3>
+<!--        <input type="password"-->
+<!--               required-->
+<!--               placeholder="password"-->
+<!--               [(ngModel)]="password">-->
+
+        <mat-form-field appearance="fill" class="passwordInput">
+          <mat-label>Enter your password</mat-label>
+          <input matInput [type]="hidePswd ? 'password' : 'text'" [(ngModel)]="password">
+          <button mat-icon-button matSuffix (click)="hidePswd = !hidePswd" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePswd" class="hidePasswordButton">
+            <mat-icon>{{hidePswd ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <div class="m-5">
+          <button class="btn btn-lg btn-primary mx-2"
+                  (click)="handleEmailLogin()">Sign In</button>
+          <button class="btn btn-lg btn-primary mx-2"
+                  (click)="handleEmailReg()">Registration</button>
+        </div>
+      </div>
+
+    </mat-drawer>
+
+    <mat-drawer-content>
+      <button mat-raised-button (click)="drawer.toggle()" class="btn btn-lg btn-dark loginButton">Login <mat-icon>menu</mat-icon></button>
+    </mat-drawer-content>
+
+  </mat-drawer-container>
+
 </ng-template>
+
