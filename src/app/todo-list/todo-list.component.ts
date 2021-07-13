@@ -3,7 +3,11 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
 import {firebase} from "firebaseui-angular";
-import {AngularFireAuthModule} from "@angular/fire/auth";
+import { AngularFireAuth } from '@angular/fire/auth';
+import {userData} from "../services/todo-service.service";
+
+import {Observable, interval, pipe} from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-todo-list',
@@ -18,9 +22,55 @@ export class TodoListComponent implements OnInit {
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
+  userData:userData = {
+    id: 'init',
+    email: 'unknown',
+    activeTodos: [],
+    completedTodos: [],
+    removedTodos: []
+  };
 
-  constructor(public service:TodoServiceService, public auth:AngularFireAuthModule) {
-    this.service.initUserObserver();
+
+  constructor(public service:TodoServiceService, public auth:AngularFireAuth) {
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.service.getUserData(user.uid)
+          .then(res => {
+           this.userData = <userData>res.data();
+           this.todos = this.userData.activeTodos;
+           console.log(this.userData)
+           console.log(this.todos);
+          })
+          .catch(err => console.log(err));
+      } else {
+        this.userData = {
+          id: 'anonymous',
+          email: 'unknown',
+          activeTodos: [],
+          completedTodos: [],
+          removedTodos: []
+        };
+      }
+      // if (user) {
+      //   this.userid = user.uid;
+      // } else {
+      //   this.userid = 'anonymous';
+      // }
+      // this.service.getUserData(this.userid).then(res => {
+      //   if(res.data()) {
+      //     this.userData = <userData>res.data();
+      //   } else {
+      //     this.userData = {
+      //       id: 'anonymous',
+      //       email: 'unknown',
+      //       activeTodos: [],
+      //       completedTodos: [],
+      //       removedTodos: []
+      //     };
+      //   }
+      //   console.log(this.userData);
+      // });
+    });
   }
 
   ngOnInit() {}

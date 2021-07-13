@@ -1,5 +1,10 @@
-  <div *ngIf="service.userid != 'anonymous'"
+  <div *ngIf="auth.user | async as user"
         class="d-flex w-100 flex-column justify-content-center align-items-center">
+<!--    *ngIf="userData.id != 'anonymous'"-->
+    <div>
+      {{userData.id}}
+    </div>
+
     <input [(ngModel)]="mainInput"
            type="text"
            placeholder="Add smth to do ..."

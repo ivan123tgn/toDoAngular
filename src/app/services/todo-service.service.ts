@@ -38,32 +38,10 @@ export class TodoServiceService {
   constructor(
     private firestore: AngularFirestore,
     public auth: AngularFireAuth,
-    private toastr: ToastrService) {
-    this.initUserObserver();
-  }
+    private toastr: ToastrService) {}
 
-  public initUserObserver() {
-    this.auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.userid = user.uid;
-      } else {
-        this.userid = 'anonymous';
-      }
-      this.getUserData(this.userid).then(res => {
-        if(res.data()) {
-          this.userData = <userData>res.data();
-        } else {
-          this.userData = {
-            id: 'anonymous',
-            email: 'unknown',
-            activeTodos: [],
-            completedTodos: [],
-            removedTodos: []
-          };
-        }
-        console.log(this.userData);
-      });
-    });
+  public async getUserData(user:string) {
+    return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
   }
 
   public emailReg(email:string, password:string) {
@@ -77,10 +55,6 @@ export class TodoServiceService {
         this.toastr.error(error.message,'SignUp');
         console.log('Something is wrong:', error.message);
       });
-  }
-
-  public async getUserData(user:string) {
-    return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
   }
 
   public emailLogin(email:string, password:string) {
