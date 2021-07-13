@@ -15,6 +15,8 @@ export class TodoLoginComponent {
 
   password:string = '';
   hidePswd:boolean = true;
+  showRegEmail: boolean = false;
+  showLogEmail: boolean = false;
   emailForm = new FormControl('', [Validators.required, Validators.email]);
 
   handleEmailReg() {

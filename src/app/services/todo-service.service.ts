@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, Input} from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
@@ -10,32 +10,136 @@ export interface toDo{
   value: string;
   completed: boolean;
   deleted: boolean;
-  id?: string;
-  createdBy?: string;
+  id: string;
+}
+
+export interface userData{
+  id: string;
+  email: string;
+  activeTodos: toDo[];
+  completedTodos: toDo[];
+  removedTodos: toDo[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class TodoServiceService {
-  userid:any = '';
-  showEmailReg:boolean = false;
+  userid:string = 'anonymous';
+  userData:userData = {
+    id: 'anonymous',
+    email: 'unknown',
+    activeTodos: [],
+    completedTodos: [],
+    removedTodos: []
+  };
+
   constructor(
     private firestore: AngularFirestore,
     public auth: AngularFireAuth,
-    private toastr: ToastrService) { }
-
-  public async getTodos(user:string) {
-    const array:toDo[]=[];
-    const todos = await this.firestore.collection("todos", ref => ref.where('createdBy','==',user)).get().toPromise();
-    if (todos && todos.docs) {
-      todos.docs.forEach((el) => {
-        array.push(<toDo>el.data());
-      })
-    }
-    return array;
+    private toastr: ToastrService) {
+    this.initUserObserver();
   }
 
+  public initUserObserver() {
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.userid = user.uid;
+      } else {
+        this.userid = 'anonymous';
+      }
+      this.getUserData(this.userid).then(res => {
+        if(res.data()) {
+          this.userData = <userData>res.data();
+        } else {
+          this.userData = {
+            id: 'anonymous',
+            email: 'unknown',
+            activeTodos: [],
+            completedTodos: [],
+            removedTodos: []
+          };
+        }
+        console.log(this.userData);
+      });
+    });
+  }
+
+  public emailReg(email:string, password:string) {
+    this.auth.createUserWithEmailAndPassword(email, password)
+      .then(res => {
+        this.toastr.success('You are successfully signed up!', 'Sign Up');
+        console.log('You are Successfully signed up!', res);
+        this.createDocumentInDatabase(this.userid,email);
+      })
+      .catch(error => {
+        this.toastr.error(error.message,'SignUp');
+        console.log('Something is wrong:', error.message);
+      });
+  }
+
+  public async getUserData(user:string) {
+    return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
+  }
+
+  public emailLogin(email:string, password:string) {
+    this.auth.signInWithEmailAndPassword(email, password)
+      .then(res => {
+        this.toastr.success('You are successfully signed in!', 'Sign In');
+        console.log('You are Successfully logged in!', res);
+      })
+      .catch(err => {
+        this.toastr.error(err.message,'SignIn');
+        console.log('Something is wrong:',err.message);
+      });
+  }
+
+  public logout() {
+    this.auth.signOut().then(res => this.toastr.warning('You are logged out.'), err => this.toastr.error('Log Out Error!'));
+  }
+
+  public loginGoogle() {
+    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then(res => {
+              this.toastr.success('You are successfully signed in!', 'Sign In');
+              const email = res.user?.email;
+              this.getUserData(this.userid).then(res => {
+                if(!res.data()) {
+                  //If Google User Does Not Exist
+                  this.createDocumentInDatabase(this.userid,email);
+                }
+              });
+            },
+            err => this.toastr.error(err.message,'SignIn'));
+  }
+
+  public createDocumentInDatabase(id:string, email:any) {
+    const userData = {
+      id: id,
+      email: email,
+      activeTodos: [],
+      completedTodos: [],
+      removedTodos: [],
+    };
+    this.firestore.collection("todoUsers").doc(id).set(userData)
+      .then(() => {
+        console.log("Document successfully written!");
+      });
+  }
+
+  public async updateUserData() {
+    this.firestore.collection("todoUsers").doc(this.userData.id).set(this.userData)
+      .then(() => {
+        console.log("Document successfully updated!");
+      });
+  }
+
+
+
+
+
+  //Old//
   public async addTodo(todoData:toDo) {
     this.firestore.collection("todos").add(todoData).then(data => {
       this.firestore.collection("todos").doc(data.id).set({id:data.id},{merge:true});
@@ -50,40 +154,12 @@ export class TodoServiceService {
     this.firestore.collection("todos").doc(id).delete();
   }
 
-  public loginGoogle() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then(res => this.toastr.success('You are successfully signed in!', 'Sign In'), err => this.toastr.error(err.message,'SignIn'));
-  }
 
-  public logout() {
-    this.auth.signOut().then(res => this.toastr.warning('You are logged out.'), err => this.toastr.error('Log Out Error!'));
-  }
 
-  public showLoginEmail() {
-    this.showEmailReg = !this.showEmailReg;
-  }
 
-  public emailReg(email:string, password:string) {
-    this.auth.createUserWithEmailAndPassword(email, password)
-      .then(res => {
-        this.toastr.success('You are successfully signed up!', 'Sign Up');
-        console.log('You are Successfully signed up!', res);
-      })
-      .catch(error => {
-        this.toastr.error(error.message,'SignUp');
-        console.log('Something is wrong:', error.message);
-      });
-  }
 
-  public emailLogin(email:string, password:string) {
-    this.auth.signInWithEmailAndPassword(email, password)
-      .then(res => {
-        this.toastr.success('You are successfully signed in!', 'Sign In');
-        console.log('You are Successfully logged in!', res);
-      })
-      .catch(err => {
-        this.toastr.error(err.message,'SignIn');
-        console.log('Something is wrong:',err.message);
-      });
-  }
+
+
+
+
 }

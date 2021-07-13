@@ -5,8 +5,6 @@ import { toDo, TodoServiceService } from '../services/todo-service.service';
 import {firebase} from "firebaseui-angular";
 import {AngularFireAuthModule} from "@angular/fire/auth";
 
-
-
 @Component({
   selector: 'app-todo-list',
   templateUrl: './todo-list.component.html',
@@ -20,39 +18,12 @@ export class TodoListComponent implements OnInit {
   numActive:number=0;
   numCompleted:number=0;
   tab:string ='total';
-  userid:string = '';
 
-  constructor(private service:TodoServiceService, public auth:AngularFireAuthModule) {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.userid = user.uid;
-      } else {
-        this.userid = '';
-      }
-      this.service.getTodos(this.userid)
-        .then(todosFromService => {
-          this.todos = todosFromService;
-          if (this.todos) {
-            this.listedTodos = this.todos.filter(el => !el.deleted);
-            this.removedTodos = this.todos.filter(el => el.deleted);
-            this.todos = this.listedTodos;
-          }
-        });
-    });
+  constructor(public service:TodoServiceService, public auth:AngularFireAuthModule) {
+    this.service.initUserObserver();
   }
 
-  async ngOnInit() {
-    // const user = this.service.getUserId() ;
-    // console.log(user);
-    // // this.userid = this.service.userid;
-    // const todos = await this.service.getTodos();
-    // // console.log(todos);
-    // if (todos) {
-    //    this.listedTodos = todos.filter(el => !el.deleted);
-    //    this.todos = this.listedTodos;
-    //    this.removedTodos = todos.filter(el => el.deleted);
-    // }
-  }
+  ngOnInit() {}
 
   addSymbol(event:any) {
     if(event.keyCode === 13) {
@@ -60,13 +31,13 @@ export class TodoListComponent implements OnInit {
         value: this.mainInput,
         completed: false,
         deleted: false,
-        createdBy: this.userid
+        id: 'unknown',
       };
-      this.listedTodos.push(todoData);
-      this.service.addTodo(todoData);
+      this.service.userData.activeTodos.push(todoData);
+      this.service.updateUserData();
       this.mainInput = '';
     }
-    this.todos = this.listedTodos;
+    this.todos = this.service.userData.activeTodos;
   }
 
   calcActive() {

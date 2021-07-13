@@ -1,4 +1,4 @@
-  <div *ngIf="userid"
+  <div *ngIf="service.userid != 'anonymous'"
         class="d-flex w-100 flex-column justify-content-center align-items-center">
     <input [(ngModel)]="mainInput"
            type="text"
