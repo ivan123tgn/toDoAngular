@@ -26,19 +26,11 @@ export interface userData{
 })
 
 export class TodoServiceService {
-  userid:string = 'anonymous';
-  userData:userData = {
-    id: 'anonymous',
-    email: 'unknown',
-    activeTodos: [],
-    completedTodos: [],
-    removedTodos: []
-  };
 
   constructor(
     private firestore: AngularFirestore,
     public auth: AngularFireAuth,
-    private toastr: ToastrService) {}
+    public toastr: ToastrService) {}
 
   public async getUserData(user:string) {
     return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
@@ -49,7 +41,10 @@ export class TodoServiceService {
       .then(res => {
         this.toastr.success('You are successfully signed up!', 'Sign Up');
         console.log('You are Successfully signed up!', res);
-        this.createDocumentInDatabase(this.userid,email);
+        const user = res.user?.uid;
+        if (user) {
+          this.createDocumentInDatabase(user,email);
+        }
       })
       .catch(error => {
         this.toastr.error(error.message,'SignUp');
@@ -78,12 +73,15 @@ export class TodoServiceService {
       .then(res => {
               this.toastr.success('You are successfully signed in!', 'Sign In');
               const email = res.user?.email;
-              this.getUserData(this.userid).then(res => {
-                if(!res.data()) {
-                  //If Google User Does Not Exist
-                  this.createDocumentInDatabase(this.userid,email);
-                }
-              });
+              const user = res.user?.uid;
+              if(user) {
+                this.getUserData(user).then(res => {
+                  if (!res.data()) {
+                    //If Google User Does Not Exist
+                    this.createDocumentInDatabase(user, email);
+                  }
+                });
+              }
             },
             err => this.toastr.error(err.message,'SignIn'));
   }
@@ -102,8 +100,8 @@ export class TodoServiceService {
       });
   }
 
-  public async updateUserData() {
-    this.firestore.collection("todoUsers").doc(this.userData.id).set(this.userData)
+  public async updateUserData(userData:userData) {
+    this.firestore.collection("todoUsers").doc(userData.id).set(userData)
       .then(() => {
         console.log("Document successfully updated!");
       });

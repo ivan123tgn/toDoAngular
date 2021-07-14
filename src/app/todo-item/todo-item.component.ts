@@ -15,6 +15,7 @@ export class TodoItemComponent implements OnInit {
   @Output() remove = new EventEmitter();
   @Output() restore = new EventEmitter();
   @Output() removeFrvr = new EventEmitter();
+  @Output() complete = new EventEmitter();
 
   @ViewChild('myCheck') myCheck:any;
   constructor(private service:TodoServiceService) {
@@ -25,10 +26,7 @@ export class TodoItemComponent implements OnInit {
   }
 
   completeTodo(item: toDo) {
-    item.completed = !item.completed;
-    if(item.id) {
-      this.service.updateTodo(item.id,{completed:item.completed});
-    }  
+   this.complete.emit(item);
   }
 
   removeTodo(item: toDo) {

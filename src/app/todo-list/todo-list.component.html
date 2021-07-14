@@ -1,9 +1,5 @@
   <div *ngIf="auth.user | async as user"
         class="d-flex w-100 flex-column justify-content-center align-items-center">
-<!--    *ngIf="userData.id != 'anonymous'"-->
-    <div>
-      {{userData.id}}
-    </div>
 
     <input [(ngModel)]="mainInput"
            type="text"
@@ -16,38 +12,38 @@
         (cdkDropListDropped)="drop($event)">
         <app-todo-item *ngFor="let todo of todos"
         [item]="todo"
-        [tab]="tab"
+        [tab]="tab" cdkDrag
         (remove)="removeTodo($event)"
         (restore)="restoreTodo($event)"
         (removeFrvr)="removeForever($event)"
-        cdkDrag>
+        (complete)="completeTodo($event)">
         </app-todo-item>
     </ul>
 
-    <div *ngIf="listedTodos.length || removedTodos.length"
+    <div *ngIf="true"
          class="d-flex justify-content-between w-75 mb-4 buttons">
         <button (click)="showTotal($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'total', 'btn-light': this.tab !== 'total'}">
-        Total: {{listedTodos.length}}
+        Total: {{userData.completedTodos.length + userData.activeTodos.length}}
         </button>
 
         <button (click)="showActive($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'active', 'btn-light': this.tab !== 'active'}">
-        Active: {{this.calcActive()}}
+        Active: {{userData.activeTodos.length}}
         </button>
 
         <button (click)="showCompleted($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'completed', 'btn-light': this.tab !== 'completed'}">
-        Completed: {{this.calcCompleted()}}
+        Completed: {{userData.completedTodos.length}}
         </button>
 
         <button (click)="showRemoved($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'removed', 'btn-light': this.tab !== 'removed'}">
-        Removed: {{removedTodos.length}}
+        Removed: {{userData.removedTodos.length}}
         </button>
 
         <button (click)="removeCompleted($event)"

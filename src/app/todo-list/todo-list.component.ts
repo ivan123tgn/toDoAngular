@@ -1,13 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectorRef, Component, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
 import {firebase} from "firebaseui-angular";
 import { AngularFireAuth } from '@angular/fire/auth';
 import {userData} from "../services/todo-service.service";
-
-import {Observable, interval, pipe} from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-todo-list',
@@ -23,23 +20,23 @@ export class TodoListComponent implements OnInit {
   numCompleted:number=0;
   tab:string ='total';
   userData:userData = {
-    id: 'init',
+    id: 'anonymous',
     email: 'unknown',
     activeTodos: [],
     completedTodos: [],
     removedTodos: []
   };
 
-
-  constructor(public service:TodoServiceService, public auth:AngularFireAuth) {
+  constructor(public service:TodoServiceService, public auth:AngularFireAuth, private ref: ChangeDetectorRef) {
     this.auth.onAuthStateChanged((user) => {
       if (user) {
         this.service.getUserData(user.uid)
           .then(res => {
            this.userData = <userData>res.data();
-           this.todos = this.userData.activeTodos;
+           this.todos = [...this.userData.activeTodos, ...this.userData.completedTodos];
            console.log(this.userData)
            console.log(this.todos);
+           this.ref.detectChanges();
           })
           .catch(err => console.log(err));
       } else {
@@ -51,25 +48,6 @@ export class TodoListComponent implements OnInit {
           removedTodos: []
         };
       }
-      // if (user) {
-      //   this.userid = user.uid;
-      // } else {
-      //   this.userid = 'anonymous';
-      // }
-      // this.service.getUserData(this.userid).then(res => {
-      //   if(res.data()) {
-      //     this.userData = <userData>res.data();
-      //   } else {
-      //     this.userData = {
-      //       id: 'anonymous',
-      //       email: 'unknown',
-      //       activeTodos: [],
-      //       completedTodos: [],
-      //       removedTodos: []
-      //     };
-      //   }
-      //   console.log(this.userData);
-      // });
     });
   }
 
@@ -81,88 +59,47 @@ export class TodoListComponent implements OnInit {
         value: this.mainInput,
         completed: false,
         deleted: false,
-        id: 'unknown',
+        id: Date.now().toString(),
       };
-      this.service.userData.activeTodos.push(todoData);
-      this.service.updateUserData();
+      this.userData.activeTodos.push(todoData);
+      this.service.updateUserData(this.userData);
       this.mainInput = '';
     }
-    this.todos = this.service.userData.activeTodos;
-  }
-
-  calcActive() {
-    return this.listedTodos.filter(todo => !todo.completed && !todo.deleted).length;
-  }
-
-  calcCompleted() {
-    return this.listedTodos.filter(todo => todo.completed && !todo.deleted).length;
+    this.todos = this.userData.activeTodos;
   }
 
   removeTodo(item: toDo) {
-    this.todos = this.todos.filter(todo => todo !== item);
     item.deleted = true;
-    this.removedTodos.push(item);
-    this.listedTodos = this.todos.filter(todo => todo.deleted === false);
-    if(item.id) {
-      this.service.updateTodo(item.id,{deleted: true})
+    if (item.completed) {
+      this.userData.completedTodos = this.userData.completedTodos.filter(todo => todo.id !== item.id);
+      this.userData.removedTodos.push(item);
+    } else {
+      this.userData.activeTodos = this.userData.activeTodos.filter(todo => todo.id !== item.id);
+      this.userData.removedTodos.push(item);
     }
+    this.todos = this.todos.filter(todo => todo.id !== item.id);
+    this.service.updateUserData(this.userData);
+    this.ref.detectChanges();
   }
 
   showRemoved(event:any) {
-    this.todos = this.removedTodos;
+    this.todos = this.userData.removedTodos;
     this.tab = 'removed';
   }
 
-  showTotal(event:any) {
-    this.todos = this.listedTodos.filter(todo => !todo.deleted);;
-    this.tab = 'total';
-  }
-
   showActive(event:any) {
-    this.todos = this.listedTodos.filter(todo => !todo.completed && !todo.deleted);
+    this.todos = this.userData.activeTodos;
     this.tab = 'active';
   }
 
-  showCompleted(event:any) {
-    this.todos = this.listedTodos.filter(todo => todo.completed && !todo.deleted);
-    this.tab = 'completed';
-  }
-
-  removeCompleted(event:any) {
-    const array = this.listedTodos.filter(todo => todo.completed);
-    array.forEach(el => {
-      el.deleted = true;
-      if(el.id) {
-        this.service.updateTodo(el.id,{deleted: true});
-      }
-      this.removedTodos.push(el);
-    })
-    this.listedTodos = this.listedTodos.filter(todo => todo.completed === false);
-    this.todos = this.listedTodos;
+  showTotal(event:any) {
+    this.todos = [...this.userData.activeTodos, ...this.userData.completedTodos];
     this.tab = 'total';
   }
 
-  restoreTodo(item:toDo) {
-    const index = this.removedTodos.indexOf(item);
-    if (index > -1) {
-      this.removedTodos.splice(index, 1);
-      item.deleted = false;
-      if(item.id) {
-        this.service.updateTodo(item.id,{deleted: false})
-      }
-      this.listedTodos.push(item);
-    }
-  }
-
-  restoreAll(event:any) {
-    while (this.removedTodos.length !== 0) {
-      let shifted:any = this.removedTodos.shift();
-      shifted.deleted = false;
-      if(shifted.id) {
-        this.service.updateTodo(shifted.id,{deleted: false});
-      }
-      this.listedTodos.push(shifted);
-    }
+  showCompleted(event:any) {
+    this.todos = this.userData.completedTodos;
+    this.tab = 'completed';
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -170,10 +107,67 @@ export class TodoListComponent implements OnInit {
   }
 
   removeForever(item:toDo){
-    this.removedTodos = this.removedTodos.filter(todo => todo !== item);
-    if(item.id) {
-      this.service.removeForever(item.id);
+    this.userData.removedTodos = this.userData.removedTodos.filter(todo => todo.id !== item.id);
+    this.service.updateUserData(this.userData);
+    this.todos = this.userData.removedTodos;
+    this.tab = 'removed';
+    this.ref.detectChanges();
+    this.service.toastr.warning('Your todo is removed forever!');
+  }
+
+  restoreTodo(item:toDo) {
+    item.deleted = false;
+    this.userData.removedTodos = this.userData.removedTodos.filter(todo => todo.id !== item.id);
+    this.todos = this.userData.removedTodos;
+    if (item.completed) {
+      this.userData.completedTodos.push(item);
+    } else {
+      this.userData.activeTodos.push(item);
     }
-    this.todos = this.removedTodos;
+    this.service.updateUserData(this.userData);
+    this.ref.detectChanges();
+    this.service.toastr.success('Your todo is restored!');
+  }
+
+  completeTodo(item:toDo) {
+    if (item.deleted) {
+      item.completed = !item.completed;
+    } else {
+      if (item.completed) {
+        item.completed = false;
+        this.userData.completedTodos = this.userData.completedTodos.filter(todo => todo.id !== item.id);
+        this.userData.activeTodos.push(item);
+      } else {
+        item.completed = true;
+        this.userData.activeTodos = this.userData.activeTodos.filter(todo => todo.id !== item.id);
+        this.userData.completedTodos.push(item);
+      }
+    }
+    this.service.updateUserData(this.userData);
+    this.ref.detectChanges();
+  }
+
+  restoreAll(event:any) {
+    this.userData.removedTodos.forEach(el => el.deleted = false);
+    const restoreActive = this.userData.removedTodos.filter(todo => !todo.completed);
+    const restoreCompleted = this.userData.removedTodos.filter(todo => todo.completed);
+    this.userData.removedTodos = [];
+    this.userData.activeTodos = [...this.userData.activeTodos, ...restoreActive];
+    this.userData.completedTodos = [...this.userData.completedTodos, ...restoreCompleted];
+    this.todos = [];
+    this.service.updateUserData(this.userData);
+    this.ref.detectChanges();
+    this.service.toastr.success('All removed todos are restored!');
+  }
+
+  removeCompleted(event:any) {
+    this.userData.completedTodos.forEach(el => el.deleted = true);
+    this.userData.removedTodos = [...this.userData.removedTodos, ...this.userData.completedTodos];
+    this.userData.completedTodos = [];
+    this.service.updateUserData(this.userData);
+    this.tab = 'total';
+    this.todos = this.userData.activeTodos;
+    this.ref.detectChanges();
+    this.service.toastr.warning('Completed todos are removed!');
   }
 }
