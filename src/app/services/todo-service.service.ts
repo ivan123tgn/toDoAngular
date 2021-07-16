@@ -2,9 +2,8 @@ import {Injectable, Input} from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
-import {TodoLoginComponent} from "../todo-login/todo-login.component";
-import {AngularFireDatabase} from "@angular/fire/database";
 import { ToastrService } from 'ngx-toastr';
+import {AngularFireFunctions} from "@angular/fire/functions";
 
 export interface toDo{
   value: string;
@@ -30,7 +29,12 @@ export class TodoServiceService {
   constructor(
     private firestore: AngularFirestore,
     public auth: AngularFireAuth,
-    public toastr: ToastrService) {}
+    public toastr: ToastrService,
+    public fns: AngularFireFunctions) {
+    const callable = fns.httpsCallable('helloWorld');
+    let data = callable({});
+    console.log(data);
+  }
 
   public async getUserData(user:string) {
     return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
@@ -106,32 +110,5 @@ export class TodoServiceService {
         console.log("Document successfully updated!");
       });
   }
-
-
-
-
-
-  //Old//
-  public async addTodo(todoData:toDo) {
-    this.firestore.collection("todos").add(todoData).then(data => {
-      this.firestore.collection("todos").doc(data.id).set({id:data.id},{merge:true});
-    })
-  }
-
-  public async updateTodo(id:string,data:any) {
-    this.firestore.collection("todos").doc(id).update(data);
-  }
-
-  public async removeForever(id:string) {
-    this.firestore.collection("todos").doc(id).delete();
-  }
-
-
-
-
-
-
-
-
 
 }

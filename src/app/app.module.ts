@@ -21,6 +21,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatIconModule} from '@angular/material/icon';
 import {ReactiveFormsModule} from '@angular/forms';
+import {AngularFireFunctionsModule} from "@angular/fire/functions";
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import {ReactiveFormsModule} from '@angular/forms';
     MatFormFieldModule,
     MatSidenavModule,
     MatIconModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AngularFireFunctionsModule,
   ],
   providers: [TodoServiceService],
   bootstrap: [AppComponent]
