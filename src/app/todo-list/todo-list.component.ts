@@ -2,9 +2,9 @@ import {ChangeDetectorRef, Component, OnChanges, OnInit, ViewChild} from '@angul
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 import { toDo, TodoServiceService } from '../services/todo-service.service';
-import {firebase} from "firebaseui-angular";
 import { AngularFireAuth } from '@angular/fire/auth';
 import {userData} from "../services/todo-service.service";
+import {formatDate} from "@angular/common";
 
 @Component({
   selector: 'app-todo-list',
@@ -13,11 +13,7 @@ import {userData} from "../services/todo-service.service";
 })
 export class TodoListComponent implements OnInit {
   todos: toDo[] = [];
-  listedTodos: toDo[] = [];
-  removedTodos: toDo[] = [];
   mainInput:any;
-  numActive:number=0;
-  numCompleted:number=0;
   tab:string ='total';
   userData:userData = {
     id: 'anonymous',
@@ -32,13 +28,32 @@ export class TodoListComponent implements OnInit {
       if (user) {
         this.service.getUserData(user.uid)
           .then(res => {
-           this.userData = <userData>res.data();
-           this.todos = [...this.userData.activeTodos, ...this.userData.completedTodos];
-           console.log(this.userData)
-           console.log(this.todos);
-           this.ref.detectChanges();
-          })
-          .catch(err => console.log(err));
+            if (res.data()) {
+              this.userData = <userData>res.data();
+              this.todos = [...this.userData.activeTodos, ...this.userData.completedTodos];
+              console.log(this.userData);
+              console.log(this.todos);
+              console.log(user.uid);
+              this.ref.detectChanges();
+            } else {
+              this.userData = this.service.createDocumentInDatabase(user.uid, user.email);
+              const date = formatDate(Date.now(),'dd-MM-yyyy HH:mm:ss','en_US','+0300');
+              if (user.email) {
+                this.service.sendEmail(user.email, {
+                  subject: 'Registration in ToDo Angular App',
+                  html: '<h1>Hello!</h1>' +
+                    '<p>Welcome to Angular ToDo App developed by Ivan Pisarenko. It is a simple and awesome app to organize your tasks with very easy to use interface.</p>' +
+                    '<p>Please, check your registration data:</p>' +
+                    '<p>E-mail: </p>' + user.email +
+                    '<p>Registration  date: </p>' + date +
+                    '<p>If you have any questions, mail me to vnpsrnk@gmail.com</p>' +
+                    '<p>Kind regards, Ivan Pisarenko </p>',
+                });
+              };
+              this.todos = [];
+              this.ref.detectChanges();
+            }
+          });
       } else {
         this.userData = {
           id: 'anonymous',
@@ -47,9 +62,11 @@ export class TodoListComponent implements OnInit {
           completedTodos: [],
           removedTodos: []
         };
+        this.todos = [];
+        this.ref.detectChanges();
       }
-    });
-  }
+    })
+  };
 
   ngOnInit() {}
 
@@ -64,8 +81,8 @@ export class TodoListComponent implements OnInit {
       this.userData.activeTodos.push(todoData);
       this.service.updateUserData(this.userData);
       this.mainInput = '';
+      this.todos = this.userData.activeTodos;
     }
-    this.todos = this.userData.activeTodos;
   }
 
   removeTodo(item: toDo) {
@@ -170,4 +187,5 @@ export class TodoListComponent implements OnInit {
     this.ref.detectChanges();
     this.service.toastr.warning('Completed todos are removed!');
   }
+
 }

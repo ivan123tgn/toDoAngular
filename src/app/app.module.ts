@@ -22,6 +22,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatIconModule} from '@angular/material/icon';
 import {ReactiveFormsModule} from '@angular/forms';
 import {AngularFireFunctionsModule} from "@angular/fire/functions";
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,8 @@ import {AngularFireFunctionsModule} from "@angular/fire/functions";
     MatIconModule,
     ReactiveFormsModule,
     AngularFireFunctionsModule,
+    MatTabsModule,
+    MatBottomSheetModule,
   ],
   providers: [TodoServiceService],
   bootstrap: [AppComponent]

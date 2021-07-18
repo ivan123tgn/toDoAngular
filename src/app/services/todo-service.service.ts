@@ -4,6 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
 import { ToastrService } from 'ngx-toastr';
 import {AngularFireFunctions} from "@angular/fire/functions";
+import {formatDate} from "@angular/common";
 
 export interface toDo{
   value: string;
@@ -20,6 +21,11 @@ export interface userData{
   removedTodos: toDo[];
 }
 
+export interface message{
+  subject: string;
+  html: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,11 +36,7 @@ export class TodoServiceService {
     private firestore: AngularFirestore,
     public auth: AngularFireAuth,
     public toastr: ToastrService,
-    public fns: AngularFireFunctions) {
-    const callable = fns.httpsCallable('helloWorld');
-    let data = callable({});
-    console.log(data);
-  }
+    public fns: AngularFireFunctions) {}
 
   public async getUserData(user:string) {
     return await this.firestore.collection('todoUsers').doc(user).get().toPromise();
@@ -45,10 +47,6 @@ export class TodoServiceService {
       .then(res => {
         this.toastr.success('You are successfully signed up!', 'Sign Up');
         console.log('You are Successfully signed up!', res);
-        const user = res.user?.uid;
-        if (user) {
-          this.createDocumentInDatabase(user,email);
-        }
       })
       .catch(error => {
         this.toastr.error(error.message,'SignUp');
@@ -74,19 +72,7 @@ export class TodoServiceService {
 
   public loginGoogle() {
     this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then(res => {
-              this.toastr.success('You are successfully signed in!', 'Sign In');
-              const email = res.user?.email;
-              const user = res.user?.uid;
-              if(user) {
-                this.getUserData(user).then(res => {
-                  if (!res.data()) {
-                    //If Google User Does Not Exist
-                    this.createDocumentInDatabase(user, email);
-                  }
-                });
-              }
-            },
+      .then(res => {this.toastr.success('You are successfully signed in!', 'Sign In')},
             err => this.toastr.error(err.message,'SignIn'));
   }
 
@@ -102,12 +88,24 @@ export class TodoServiceService {
       .then(() => {
         console.log("Document successfully written!");
       });
+    return userData;
   }
 
   public async updateUserData(userData:userData) {
     this.firestore.collection("todoUsers").doc(userData.id).set(userData)
       .then(() => {
         console.log("Document successfully updated!");
+      });
+  }
+
+  public sendEmail(to:string, message:message) {
+    const emailText = {
+      to: to,
+      message: message,
+    };
+    this.firestore.collection("mail").doc(Date.now().toString()).set(emailText)
+      .then(() => {
+        console.log("Email is successfully created!");
       });
   }
 

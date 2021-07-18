@@ -21,29 +21,29 @@
     </ul>
 
     <div *ngIf="true"
-         class="d-flex justify-content-between w-75 mb-4 buttons">
+      class="d-flex justify-content-between w-75 mb-4 buttons">
         <button (click)="showTotal($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'total', 'btn-light': this.tab !== 'total'}">
-        Total: {{userData.completedTodos.length + userData.activeTodos.length}}
+        Total: {{userData ? userData.completedTodos.length + userData.activeTodos.length : 0}}
         </button>
 
         <button (click)="showActive($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'active', 'btn-light': this.tab !== 'active'}">
-        Active: {{userData.activeTodos.length}}
+        Active: {{userData ? userData.activeTodos.length : 0}}
         </button>
 
         <button (click)="showCompleted($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'completed', 'btn-light': this.tab !== 'completed'}">
-        Completed: {{userData.completedTodos.length}}
+        Completed: {{userData? userData.completedTodos.length : 0}}
         </button>
 
         <button (click)="showRemoved($event)"
         class="btn btn-lg"
         [ngClass]="{'btn-primary': this.tab === 'removed', 'btn-light': this.tab !== 'removed'}">
-        Removed: {{userData.removedTodos.length}}
+        Removed: {{userData ? userData.removedTodos.length : 0}}
         </button>
 
         <button (click)="removeCompleted($event)"
