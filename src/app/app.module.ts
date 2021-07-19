@@ -33,7 +33,7 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     TodoLoginComponent
   ],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     FormsModule,
     NgbModule,
     BrowserAnimationsModule,
