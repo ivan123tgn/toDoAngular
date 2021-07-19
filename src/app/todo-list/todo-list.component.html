@@ -20,7 +20,7 @@
         </app-todo-item>
     </ul>
 
-    <div *ngIf="true"
+    <div *ngIf="userData.activeTodos.length > 0 || userData.removedTodos.length > 0 || userData.completedTodos.length > 0"
       class="d-flex justify-content-between w-75 mb-4 buttons">
         <button (click)="showTotal($event)"
         class="btn btn-lg"

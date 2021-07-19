@@ -102,21 +102,25 @@ export class TodoListComponent implements OnInit {
   showRemoved(event:any) {
     this.todos = this.userData.removedTodos;
     this.tab = 'removed';
+    this.ref.detectChanges();
   }
 
   showActive(event:any) {
     this.todos = this.userData.activeTodos;
     this.tab = 'active';
+    this.ref.detectChanges();
   }
 
   showTotal(event:any) {
     this.todos = [...this.userData.activeTodos, ...this.userData.completedTodos];
     this.tab = 'total';
+    this.ref.detectChanges();
   }
 
   showCompleted(event:any) {
     this.todos = this.userData.completedTodos;
     this.tab = 'completed';
+    this.ref.detectChanges();
   }
 
   drop(event: CdkDragDrop<string[]>) {
